@@ -1,14 +1,18 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
+
+from callbacks import callback_router
 from config import TOKEN
 
-# Экземпляры бота и диспетчера
+from answers import get_help_text, get_start_text, get_status_text
+from keyboards import start_keyboard, help_keyboard, status_keyboard
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+dp.include_router(callback_router)
 
 
-# Устанавливаем меню команд (отображается в интерфейсе Telegram)
 async def set_bot_commands():
     commands = [
         types.BotCommand(command="start", description="Запуск бота"),
@@ -20,49 +24,39 @@ async def set_bot_commands():
 
 @dp.message(Command("start"))
 async def process_start_command(message: types.Message):
-    user_info = (
-        f"Привет, {message.from_user.full_name}!\n"
-        f"ID: {message.from_user.id}\n"
-        f"Username: @{message.from_user.username}\n\n"
-        f"Я простой бот с базовыми командами.\n"
-        f"Используй меню команд или вводи их вручную."
+    user = message.from_user
+
+    await message.answer(
+        text=get_start_text(user=user),
+        reply_markup=start_keyboard()
     )
-    await message.answer(user_info)
 
 
 @dp.message(Command("help"))
 async def process_help_command(message: types.Message):
-    help_text = (
-        "📚 Справочная информация:\n\n"
-        "/start - Запуск бота и информация о пользователе\n"
-        "/help - Справка по командам\n"
-        "/status - Информация о пользователе (ID и username)\n\n"
-        "Бот также отвечает эхом на любое текстовое сообщение."
+    await message.answer(
+        text=get_help_text(),
+        reply_markup=help_keyboard()
     )
-    await message.answer(help_text)
 
 
 @dp.message(Command("status"))
 async def process_status_command(message: types.Message):
-    status_text = (
-        "👤 Информация о пользователе:\n\n"
-        f"🆔 ID: {message.from_user.id}\n"
-        f"📛 Username: @{message.from_user.username}\n"
-        f"👀 Имя: {message.from_user.first_name}"
+    user = message.from_user
+
+    await message.answer(
+        text=get_status_text(user=user),
+        reply_markup=status_keyboard()
     )
-    if message.from_user.last_name:
-        status_text += f" {message.from_user.last_name}"
-    await message.answer(status_text)
 
 
-# Эхо-ответ на любое сообщение
 @dp.message()
 async def echo_message(message: types.Message):
     await message.answer(message.text)
 
 
 async def main():
-    await set_bot_commands()  # Устанавливаем меню команд
+    await set_bot_commands()
     await dp.start_polling(bot)
 
 
