@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
@@ -11,6 +13,10 @@ callback_router = Router()
 async def handle_start(callback: CallbackQuery):
     user = callback.from_user
 
+    logging.info(
+        f"User - @{user.username} получил(а) callback /start"
+    )
+
     await callback.message.edit_text(
         text=get_start_text(user=user),
         reply_markup=start_keyboard()
@@ -20,6 +26,12 @@ async def handle_start(callback: CallbackQuery):
 
 @callback_router.callback_query(F.data == "help")
 async def handle_help(callback: CallbackQuery):
+    user = callback.from_user
+
+    logging.info(
+        f"User - @{user.username} получил(а) callback /help"
+    )
+
     await callback.message.edit_text(
         text=get_help_text(),
         reply_markup=help_keyboard()
@@ -30,6 +42,10 @@ async def handle_help(callback: CallbackQuery):
 @callback_router.callback_query(F.data == "status")
 async def handle_status(callback: CallbackQuery):
     user = callback.from_user
+
+    logging.info(
+        f"User - @{user.username} получил(а) callback /status"
+    )
 
     await callback.message.edit_text(
         text=get_status_text(user=user),
