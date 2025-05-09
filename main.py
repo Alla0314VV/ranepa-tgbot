@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 
@@ -7,10 +8,13 @@ from config import TOKEN
 
 from answers import get_help_text, get_start_text, get_status_text
 from keyboards import start_keyboard, help_keyboard, status_keyboard
+from logger import setup_logging
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 dp.include_router(callback_router)
+
+setup_logging()
 
 
 async def set_bot_commands():
@@ -26,6 +30,10 @@ async def set_bot_commands():
 async def process_start_command(message: types.Message):
     user = message.from_user
 
+    logging.info(
+        f"User - @{user.username} ввел(а) /start"
+    )
+
     await message.answer(
         text=get_start_text(user=user),
         reply_markup=start_keyboard()
@@ -34,6 +42,10 @@ async def process_start_command(message: types.Message):
 
 @dp.message(Command("help"))
 async def process_help_command(message: types.Message):
+    logging.info(
+        f"User - @{message.from_user.username} ввел(а) /help"
+    )
+
     await message.answer(
         text=get_help_text(),
         reply_markup=help_keyboard()
@@ -44,6 +56,10 @@ async def process_help_command(message: types.Message):
 async def process_status_command(message: types.Message):
     user = message.from_user
 
+    logging.info(
+        f"User - @{user.username} ввел(а) /start"
+    )
+
     await message.answer(
         text=get_status_text(user=user),
         reply_markup=status_keyboard()
@@ -52,6 +68,10 @@ async def process_status_command(message: types.Message):
 
 @dp.message()
 async def echo_message(message: types.Message):
+    logging.info(
+        f"User - @{message.from_user.username} написал(а) {message.text}"
+    )
+
     await message.answer(message.text)
 
 
