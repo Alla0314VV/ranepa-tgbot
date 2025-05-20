@@ -57,7 +57,7 @@ async def process_status_command(message: types.Message):
     user = message.from_user
 
     logging.info(
-        f"User - @{user.username} ввел(а) /start"
+        f"User - @{user.username} ввел(а) /status"
     )
 
     await message.answer(
